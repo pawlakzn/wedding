@@ -147,6 +147,22 @@
   <h2 class="text-2xl font-bold mb-4">Pytania do sal</h2>
   <p class="text-sm text-gray-500 mb-4">Zaznacz pytania, na które już masz odpowiedź. Stan zapisuje się automatycznie.</p>
   <div class="print-only text-center mb-4"><strong>Lista pytań do sal weselnych</strong></div>
+
+  <!-- Pełny kwestionariusz -->
+  <div class="mb-6">
+    <button onclick="toggleFullQuestionnaire()" id="fullQBtn" class="flex items-center gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:bg-gray-50 w-full text-left">
+      <span id="fullQArrow" class="transition-transform duration-200">▶</span>
+      <span>Pełny kwestionariusz</span>
+      <span id="fullQProgress" class="ml-auto text-gray-500"></span>
+      <div class="w-24 bg-gray-200 rounded-full h-1.5 ml-2">
+        <div id="fullQProgressBar" class="bg-rose-400 h-1.5 rounded-full" style="width:0%"></div>
+      </div>
+    </button>
+    <div id="fullQPanel" class="hidden mt-3">
+      <div id="fullQContent"></div>
+    </div>
+  </div>
+
   <div id="questionsList" class="space-y-6"></div>
 </section>
 
@@ -664,6 +680,184 @@ function toggleQuestion(key, cb) {
   renderQuestions();
 }
 
+// ===== FULL QUESTIONNAIRE =====
+const QUESTIONNAIRE = [
+  { category: "Cennik i finansowanie", questions: [
+    "Jakie są ceny na 2026 rok (cena za osobę, wynajem sali)?",
+    "Czy cena zawiera obsługę kelnerską i sprzątanie?",
+    "Jakie są obowiązkowe opłaty dodatkowe?",
+  ]},
+  { category: "Zaliczka i płatności", questions: [
+    "Jak wygląda struktura zaliczki (kwota, terminy)?",
+    "Jaki jest harmonogram płatności całości?",
+    "Jakie są warunki anulowania rezerwacji?",
+  ]},
+  { category: "Zakwaterowanie", questions: [
+    "Ile pokoi/miejsc noclegowych jest dostępnych?",
+    "Jaka jest cena za nocleg?",
+    "Czy śniadanie jest wliczone w cenę?",
+    "Jakie są godziny check-in i check-out?",
+    "Czy para młoda ma gratis pokój?",
+  ]},
+  { category: "Wyżywienie", questions: [
+    "Jakie są dostępne opcje menu (warianty cenowe)?",
+    "Jaka jest polityka dla dzieci (bezpłatne do ilu lat, zniżki)?",
+    "Czy można zamówić tort weselny u zewnętrznego cukiernika?",
+  ]},
+  { category: "Alkohol", questions: [
+    "Ile wynosi opłata za wniesienie własnego alkoholu?",
+    "Jaka jest opłata za obsługę własnego alkoholu?",
+  ]},
+  { category: "Czas trwania i logistyka", questions: [
+    "O której godzinie kończy się wesele?",
+    "Jaka jest cena i jednostka za nadgodziny?",
+    "O której można zacząć dekorować salę?",
+    "Czy jest możliwość wesela w piątek lub poza sezonem?",
+  ]},
+  { category: "Obsługa i wyposażenie", questions: [
+    "Jaki jest stosunek kelnerów do gości?",
+    "Co jest wliczone w cenę (stoły, krzesła, dekoracje)?",
+    "Czy jest parking dla gości?",
+    "Czy jest możliwość organizacji ślubu plenerowego?",
+  ]},
+  { category: "Dostępność terminów", questions: [
+    "Jakie terminy w 2026 roku są dostępne?",
+    "Czy sala jest już zarezerwowana na wybrane daty?",
+  ]},
+];
+
+// Auto-check functions parallel to QUESTIONNAIRE (v => boolean)
+const QUESTIONNAIRE_CHECKS = [
+  // Cennik i finansowanie
+  [
+    v => v.pricing?.perPerson != null && (v.pricing?.year || 0) >= 2026,
+    v => v.includes?.length > 0,
+    v => v.pricing?.mandatoryFees?.length > 0,
+  ],
+  // Zaliczka i płatności
+  [
+    v => v.deposit?.structure != null,
+    v => v.deposit?.description != null,
+    v => false,
+  ],
+  // Zakwaterowanie
+  [
+    v => v.rooms?.count != null,
+    v => v.rooms?.pricePerNight != null || v.rooms?.priceOptions?.length > 0,
+    v => v.rooms?.breakfastIncluded != null,
+    v => v.rooms?.checkoutTime != null || v.rooms?.checkIn != null,
+    v => v.rooms?.brideGroomFree != null,
+  ],
+  // Wyżywienie
+  [
+    v => v.pricing?.menuOptions?.length > 0,
+    v => v.children?.freeUpTo != null || v.children?.discountUpTo != null,
+    v => false,
+  ],
+  // Alkohol
+  [
+    v => v.alcoholPolicy?.corkageFee != null || v.alcoholPolicy?.serviceFee != null,
+    v => v.alcoholPolicy?.serviceFee != null || v.alcoholPolicy?.corkageFee != null,
+  ],
+  // Czas trwania i logistyka
+  [
+    v => v.timing?.endTime != null,
+    v => v.timing?.overtimePrice != null,
+    v => false,
+    v => v.discounts?.length > 0,
+  ],
+  // Obsługa i wyposażenie
+  [
+    v => v.staffing?.ratio != null,
+    v => v.includes?.length > 0,
+    v => false,
+    v => false,
+  ],
+  // Dostępność terminów
+  [
+    v => false,
+    v => false,
+  ],
+];
+
+function fullQKey(catIdx, qIdx, venueId) {
+  return `fq_${catIdx}_${qIdx}_${venueId}`;
+}
+
+function effectiveChecked(saved, ci, qi, v) {
+  const key = fullQKey(ci, qi, v.id);
+  return saved[key] !== undefined ? saved[key] : QUESTIONNAIRE_CHECKS[ci][qi](v);
+}
+
+function renderFullQuestionnaire() {
+  const saved = JSON.parse(localStorage.getItem('weddingFullQ') || '{}');
+  const total = QUESTIONNAIRE.reduce((s, c) => s + c.questions.length, 0) * V.length;
+  let answered = 0;
+  QUESTIONNAIRE.forEach((cat, ci) => cat.questions.forEach((_, qi) => V.forEach(v => {
+    if (effectiveChecked(saved, ci, qi, v)) answered++;
+  })));
+  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+
+  document.getElementById('fullQProgress').textContent = `${answered}/${total}`;
+  document.getElementById('fullQProgressBar').style.width = pct + '%';
+
+  const shortName = v => v.name.length > 10 ? v.name.slice(0, 9) + '…' : v.name;
+
+  const content = QUESTIONNAIRE.map((cat, ci) => {
+    const rows = cat.questions.map((q, qi) => {
+      const cells = V.map(v => {
+        const key = fullQKey(ci, qi, v.id);
+        const isAuto = saved[key] === undefined && QUESTIONNAIRE_CHECKS[ci][qi](v);
+        const checked = effectiveChecked(saved, ci, qi, v) ? 'checked' : '';
+        const autoClass = isAuto ? 'opacity-60' : '';
+        const title = isAuto ? 'title="Zaznaczone automatycznie na podstawie danych"' : '';
+        return `<td class="text-center px-2 py-1.5">
+          <input type="checkbox" ${checked} ${title} onchange="toggleFullQ('${key}', this)" class="w-4 h-4 accent-rose-500 cursor-pointer ${autoClass}">
+        </td>`;
+      }).join('');
+      const allChecked = V.every(v => effectiveChecked(saved, ci, qi, v));
+      return `<tr class="border-t border-gray-100 ${allChecked ? 'bg-green-50' : 'hover:bg-gray-50'}">
+        <td class="py-1.5 px-3 text-sm ${allChecked ? 'text-gray-400 line-through' : 'text-gray-700'}">${q}</td>
+        ${cells}
+      </tr>`;
+    }).join('');
+
+    const header = V.map(v => `<th class="text-center px-2 py-2 text-xs font-medium text-gray-500 whitespace-nowrap">${shortName(v)}</th>`).join('');
+
+    return `<div class="mb-4">
+      <h4 class="text-sm font-semibold text-rose-700 uppercase tracking-wide mb-1 px-1">${cat.category}</h4>
+      <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="w-full bg-white text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="text-left px-3 py-2 text-xs font-medium text-gray-500">Pytanie</th>
+              ${header}
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('fullQContent').innerHTML = content;
+}
+
+function toggleFullQ(key, cb) {
+  const saved = JSON.parse(localStorage.getItem('weddingFullQ') || '{}');
+  saved[key] = cb.checked;
+  localStorage.setItem('weddingFullQ', JSON.stringify(saved));
+  renderFullQuestionnaire();
+}
+
+function toggleFullQuestionnaire() {
+  const panel = document.getElementById('fullQPanel');
+  const arrow = document.getElementById('fullQArrow');
+  const hidden = panel.classList.toggle('hidden');
+  arrow.textContent = hidden ? '▶' : '▼';
+  if (!hidden) renderFullQuestionnaire();
+}
+
 // ===== COMPLETENESS =====
 function renderCompleteness() {
   const fields = [
@@ -772,6 +966,7 @@ renderMap();
 renderCalculator();
 renderVenueCards();
 renderQuestions();
+renderFullQuestionnaire();
 renderCompleteness();
 </script>
 </body>
