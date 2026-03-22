@@ -45,10 +45,17 @@
       <a href="#pytania" class="hover:text-rose-600">Pytania</a>
       <a href="#braki" class="hover:text-rose-600">Kompletność</a>
     </div>
-    <div class="flex items-center gap-2 text-sm">
-      <label>Gości:</label>
-      <input type="range" id="globalGuests" min="60" max="250" value="150" class="w-28">
-      <span id="globalGuestsVal" class="font-bold text-rose-700 w-8">150</span>
+    <div class="flex items-center gap-4 text-sm flex-wrap">
+      <div class="flex items-center gap-2">
+        <label>Gości:</label>
+        <input type="range" id="globalGuests" min="60" max="250" value="150" class="w-28">
+        <span id="globalGuestsVal" class="font-bold text-rose-700 w-8">150</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <label>Noclegów:</label>
+        <input type="range" id="globalBeds" min="0" max="60" value="25" class="w-20">
+        <span id="globalBedsVal" class="font-bold text-rose-700 w-8">25</span>
+      </div>
     </div>
   </div>
 </nav>
@@ -64,13 +71,14 @@
         <tr>
           <th class="px-3 py-2 text-left cursor-pointer sort-arrow" data-col="name">Sala</th>
           <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="perPerson">Cena/os</th>
-          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="menuCost">Menu (150 os.)</th>
-          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="totalCost">Koszt całk.</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="menuCost">Koszt menu</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="otherCost">Koszt inne</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="bedCost">Koszt noclegów</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="totalCost">Koszt całkowity</th>
           <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="capacity">Pojemność</th>
-          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="beds">Noclegi</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="beds">Noclegi (miejsc)</th>
           <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="distWro">z Wrocławia</th>
           <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="distWie">z Wieruszowa</th>
-          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="hall">Wynajem sali</th>
           <th class="px-3 py-2 text-left">Zaliczka</th>
         </tr>
       </thead>
@@ -205,7 +213,7 @@ const VENUES_DATA = {
         "website": "https://trzydrzewa.com/"
       },
       "capacity": {
-        "min": null,
+        "min": 100,
         "max": 180
       },
       "pricing": {
@@ -372,12 +380,10 @@ const VENUES_DATA = {
         }
       ],
       "dataGaps": [
-        "Min. gości",
         "Zaliczka",
         "Godz. zakończenia/nadgodziny"
       ],
       "questionsToAsk": [
-        "Jaka jest minimalna liczba gości?",
         "Jak wygląda struktura zaliczki (kwota, terminy)?",
         "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
         "Jakie są dostępne terminy na 2026 rok?"
@@ -403,8 +409,8 @@ const VENUES_DATA = {
       },
       "contact": {
         "person": "Michał Selucha",
-        "phone": "882 164 316",
-        "email": null,
+        "phone": "882 164 316 / 668 961 560",
+        "email": "wesela@ptachmachnice.pl",
         "instagram": "stary_folwark_machnice"
       },
       "capacity": {
@@ -609,7 +615,8 @@ const VENUES_DATA = {
       },
       "capacity": {
         "min": 100,
-        "max": null,
+        "max": 140,
+        "maxNote": "126–140 os.",
         "minNote": "Min. 100 os. (kwi-paź), 60 os. (lis-mar)"
       },
       "pricing": {
@@ -702,11 +709,9 @@ const VENUES_DATA = {
         "description": "1 kelner na 20 osób, w cenie"
       },
       "dataGaps": [
-        "Max pojemność sali",
         "Godz. zakończenia/nadgodziny"
       ],
       "questionsToAsk": [
-        "Jaka jest maksymalna pojemność sali? Czy 150 osób się zmieści?",
         "O której godzinie standardowo kończy się wesele i jaka jest cena za nadgodziny?"
       ]
     },
@@ -766,7 +771,8 @@ const VENUES_DATA = {
       "children": {
         "freeUpTo": 3,
         "discountUpTo": 8,
-        "discountPercent": 60
+        "discountPercent": 40,
+        "description": "Do 3 lat: gratis. 3-8 lat: 60% ceny menu (rabat 40%)."
       },
       "rooms": {
         "count": 58,
@@ -982,6 +988,7 @@ const V = VENUES_DATA.venues;
 
 // ===== STATE =====
 let guestCount = VENUES_DATA.meta.defaultGuests;
+let bedCount = 25;
 let sortCol = null;
 let sortDir = 'asc';
 
@@ -1000,12 +1007,60 @@ function getMenuCost(v, guests) {
   if (pp == null) return null;
   return pp * guests;
 }
-function getTotalCost(v, guests) {
-  const menu = getMenuCost(v, guests);
-  if (menu == null) return null;
+function getOtherCosts(v) {
   const hall = v.pricing.hallRental || v.pricing.flatFee || 0;
   const mandatory = (v.pricing.mandatoryFees || []).reduce((s, f) => s + (f.price || 0), 0);
-  return menu + hall + mandatory;
+  return hall + mandatory;
+}
+function getOtherCostsNote(v) {
+  const parts = [];
+  if (v.pricing.hallRental) parts.push(`Wynajem sali: ${fmtPLN(v.pricing.hallRental)}`);
+  if (v.pricing.flatFee) parts.push(`Opłata stała: ${fmtPLN(v.pricing.flatFee)}${v.rooms && v.rooms.totalBeds && v.pricing.flatFee ? ' (wliczone ' + v.rooms.totalBeds + ' noclegów)' : ''}`);
+  (v.pricing.mandatoryFees || []).forEach(f => parts.push(`${f.name}: ${fmtPLN(f.price)}`));
+  return parts.join(' | ') || null;
+}
+function getAccommodationCost(v, beds) {
+  if (beds === 0) return 0;
+  // Noclegi wliczone w opłatę stałą (np. Folwark Machnice)
+  if (v.pricing.flatFee && v.rooms && v.rooms.pricePerNight === null && v.rooms.totalBeds != null) {
+    const included = v.rooms.totalBeds;
+    const extra = Math.max(0, beds - included);
+    if (extra === 0) return 0;
+    const extraItem = (v.rooms.extras || []).find(e => e.name && e.name.toLowerCase().includes('dostawka'));
+    return extra * (extraItem ? extraItem.price : 110);
+  }
+  // Cena per osoba
+  if (v.rooms && v.rooms.pricePerNight != null) {
+    return v.rooms.pricePerNight * beds;
+  }
+  // Opcje pokoi (np. Aroma Stone) — używamy pokoi 2-os
+  if (v.rooms && v.rooms.priceOptions) {
+    const twoOs = v.rooms.priceOptions.find(p => p.type === '2-os');
+    if (twoOs) return Math.ceil(beds / 2) * twoOs.price;
+  }
+  return null;
+}
+function getAccommodationNote(v, beds) {
+  if (beds === 0) return '0 noclegów';
+  if (v.pricing.flatFee && v.rooms && v.rooms.pricePerNight === null && v.rooms.totalBeds != null) {
+    const included = v.rooms.totalBeds;
+    const extra = Math.max(0, beds - included);
+    if (extra === 0) return `${beds} noclegów wliczonych w opłatę stałą`;
+    return `${included} noclegów w opłacie stałej + ${extra} dostawek × 110 zł`;
+  }
+  if (v.rooms && v.rooms.pricePerNight != null) return `${beds} os. × ${v.rooms.pricePerNight} zł`;
+  if (v.rooms && v.rooms.priceOptions) {
+    const twoOs = v.rooms.priceOptions.find(p => p.type === '2-os');
+    if (twoOs) return `${Math.ceil(beds/2)} pokoi 2-os. × ${twoOs.price} zł`;
+  }
+  return null;
+}
+function getTotalCost(v, guests, beds) {
+  const menu = getMenuCost(v, guests);
+  if (menu == null) return null;
+  const other = getOtherCosts(v);
+  const acc = getAccommodationCost(v, beds) || 0;
+  return menu + other + acc;
 }
 function getBeds(v) { return v.rooms.totalBeds; }
 function getHall(v) {
@@ -1024,17 +1079,19 @@ function renderCompareTable() {
   let rows = V.map(v => {
     const pp = getPerPerson(v);
     const mc = getMenuCost(v, guestCount);
-    const tc = getTotalCost(v, guestCount);
+    const oc = getOtherCosts(v);
+    const bc = getAccommodationCost(v, bedCount);
+    const tc = getTotalCost(v, guestCount, bedCount);
     const cap = v.capacity.max;
     const b = getBeds(v);
     const bNearby = (v.nearbyAccommodation || []).reduce((s, a) => s + (a.beds || 0), 0);
     const dw = v.distance.fromWroclaw.minutes;
     const dwi = v.distance.fromWieruszow.minutes;
-    return { v, pp, mc, tc, cap, b, bNearby, dw, dwi, hall: getHall(v), deposit: getDeposit(v) };
+    return { v, pp, mc, oc, bc, tc, cap, b, bNearby, dw, dwi, deposit: getDeposit(v) };
   });
 
   if (sortCol) {
-    const key = { name: r => r.v.name, perPerson: r => r.pp, menuCost: r => r.mc, totalCost: r => r.tc, capacity: r => r.cap, beds: r => r.b, distWro: r => r.dw, distWie: r => r.dwi, hall: r => r.hall }[sortCol];
+    const key = { name: r => r.v.name, perPerson: r => r.pp, menuCost: r => r.mc, otherCost: r => r.oc, bedCost: r => r.bc, totalCost: r => r.tc, capacity: r => r.cap, beds: r => r.b, distWro: r => r.dw, distWie: r => r.dwi }[sortCol];
     if (key) {
       rows.sort((a, b) => {
         const va = key(a), vb = key(b);
@@ -1050,6 +1107,12 @@ function renderCompareTable() {
   const menus = rows.map(r => r.mc).filter(x => x != null);
   const minMenu = Math.min(...menus);
   const maxMenu = Math.max(...menus);
+  const others = rows.map(r => r.oc).filter(x => x != null && x > 0);
+  const minOther = others.length ? Math.min(...others) : null;
+  const maxOther = others.length ? Math.max(...others) : null;
+  const beds_ = rows.map(r => r.bc).filter(x => x != null);
+  const minBed = beds_.length ? Math.min(...beds_) : null;
+  const maxBed = beds_.length ? Math.max(...beds_) : null;
   const totals = rows.map(r => r.tc).filter(x => x != null);
   const minTotal = Math.min(...totals);
   const maxTotal = Math.max(...totals);
@@ -1058,21 +1121,28 @@ function renderCompareTable() {
     const v = r.v;
     const priceClass = r.pp === minPrice ? 'text-green-700 font-bold' : r.pp === maxPrice ? 'text-red-600' : '';
     const menuClass = r.mc === minMenu ? 'text-green-700 font-bold' : r.mc === maxMenu ? 'text-red-600' : '';
+    const otherClass = minOther != null && r.oc === minOther && r.oc > 0 ? 'text-green-700 font-bold' : minOther != null && r.oc === maxOther && r.oc > 0 ? 'text-red-600' : '';
+    const bedClass = minBed != null && r.bc === minBed ? 'text-green-700 font-bold' : minBed != null && r.bc === maxBed ? 'text-red-600' : '';
     const totalClass = r.tc === minTotal ? 'text-green-700 font-bold' : r.tc === maxTotal ? 'text-red-600' : '';
     const bedWarn = (r.b != null && r.b < 25) ? warn(true) : (r.b == null ? warn(true) : '');
     const capWarn = (r.cap != null && r.cap < 150) ? warn(true) : (r.cap == null ? warn(true) : '');
     const yearWarn = v.pricing.year < 2026 ? ' <span class="text-xs text-amber-600">('+v.pricing.year+'!)</span>' : '';
+    const otherNote = getOtherCostsNote(v);
+    const bedNote = getAccommodationNote(v, bedCount);
+    const ocDisplay = r.oc > 0 ? fmtPLN(r.oc) : '—';
+    const bcDisplay = r.bc == null ? '<span class="text-gray-400">brak danych</span>' : r.bc === 0 ? '<span class="text-green-700 font-bold tooltip" data-tip="' + (bedNote||'') + '">wliczone</span>' : fmtPLN(r.bc);
 
     return `<tr class="border-t hover:bg-rose-50 cursor-pointer" onclick="document.getElementById('card-${v.id}').scrollIntoView({behavior:'smooth'})">
-      <td class="px-3 py-2 font-medium">${v.name}</td>
-      <td class="px-3 py-2 text-right ${priceClass}">${fmtPLN(r.pp)}${yearWarn}</td>
-      <td class="px-3 py-2 text-right ${menuClass}">${fmtPLN(r.mc)}</td>
-      <td class="px-3 py-2 text-right ${totalClass}">${fmtPLN(r.tc)}</td>
-      <td class="px-3 py-2 text-right">${fmt(r.cap)} ${capWarn}</td>
-      <td class="px-3 py-2 text-right">${fmt(r.b)} ${bedWarn}${r.bNearby > 0 ? ' <span class="text-gray-400">(+' + r.bNearby + ')</span>' : ''}</td>
-      <td class="px-3 py-2 text-right">${r.dw} min (${v.distance.fromWroclaw.km} km)</td>
-      <td class="px-3 py-2 text-right">${r.dwi} min (${v.distance.fromWieruszow.km} km)</td>
-      <td class="px-3 py-2 text-right">${fmtPLN(r.hall)}</td>
+      <td class="px-3 py-2 font-medium whitespace-nowrap">${v.name}</td>
+      <td class="px-3 py-2 text-right ${priceClass} whitespace-nowrap">${fmtPLN(r.pp)}${yearWarn}</td>
+      <td class="px-3 py-2 text-right ${menuClass} whitespace-nowrap">${fmtPLN(r.mc)}</td>
+      <td class="px-3 py-2 text-right ${otherClass} whitespace-nowrap">${otherNote ? '<span class="tooltip" data-tip="' + otherNote + '">' + ocDisplay + '</span>' : ocDisplay}</td>
+      <td class="px-3 py-2 text-right ${bedClass} whitespace-nowrap">${bedNote && r.bc !== 0 ? '<span class="tooltip" data-tip="' + bedNote + '">' + bcDisplay + '</span>' : bcDisplay}</td>
+      <td class="px-3 py-2 text-right ${totalClass} whitespace-nowrap font-semibold">${fmtPLN(r.tc)}</td>
+      <td class="px-3 py-2 text-right whitespace-nowrap">${fmt(r.cap)} ${capWarn}</td>
+      <td class="px-3 py-2 text-right whitespace-nowrap">${fmt(r.b)} ${bedWarn}${r.bNearby > 0 ? ' <span class="text-gray-400">(+' + r.bNearby + ')</span>' : ''}</td>
+      <td class="px-3 py-2 text-right whitespace-nowrap">${r.dw} min (${v.distance.fromWroclaw.km} km)</td>
+      <td class="px-3 py-2 text-right whitespace-nowrap">${r.dwi} min (${v.distance.fromWieruszow.km} km)</td>
       <td class="px-3 py-2 text-sm">${r.deposit || '<span class="text-gray-400">brak danych</span>'}</td>
     </tr>`;
   }).join('');
@@ -1243,7 +1313,7 @@ function renderVenueCards() {
   const el = document.getElementById('venueCards');
   el.innerHTML = V.map(v => {
     const pp = getPerPerson(v);
-    const tc = getTotalCost(v, guestCount);
+    const tc = getTotalCost(v, guestCount, bedCount);
     const bedsMet = v.rooms.meetsMinimum25;
     const bedLabel = bedsMet === true ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Min. 25 — OK</span>' :
                      bedsMet === false ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">Poniżej 25!</span>' :
@@ -1280,7 +1350,7 @@ function renderVenueCards() {
         <div>
           <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Pojemność</h4>
           <div class="text-sm ${gap(v.capacity.max)}">
-            ${v.capacity.min ? 'Min: ' + v.capacity.min + ' | ' : ''}Max: ${v.capacity.max ? v.capacity.max + ' os.' : '<span class="text-yellow-600">brak danych</span>'}
+            ${v.capacity.min ? 'Min: ' + v.capacity.min + ' | ' : ''}Max: ${v.capacity.max ? (v.capacity.maxNote || v.capacity.max + ' os.') : '<span class="text-yellow-600">brak danych</span>'}
             ${v.capacity.max && v.capacity.max < 150 ? warn(true) + ' Może być za mało na 150 gości' : ''}
             ${v.capacity.description ? '<div class="text-xs text-gray-500">' + v.capacity.description + '</div>' : ''}
             ${v.capacity.minNote ? '<div class="text-xs text-gray-500">' + v.capacity.minNote + '</div>' : ''}
@@ -1471,6 +1541,8 @@ const globalSlider = document.getElementById('globalGuests');
 const globalVal = document.getElementById('globalGuestsVal');
 const calcSlider = document.getElementById('calcGuests');
 const calcVal = document.getElementById('calcGuestsVal');
+const globalBedsSlider = document.getElementById('globalBeds');
+const globalBedsVal = document.getElementById('globalBedsVal');
 
 function updateGuests(val) {
   guestCount = parseInt(val);
@@ -1483,8 +1555,16 @@ function updateGuests(val) {
   renderCalculator();
 }
 
+function updateBeds(val) {
+  bedCount = parseInt(val);
+  globalBedsSlider.value = val;
+  globalBedsVal.textContent = val;
+  renderCompareTable();
+}
+
 globalSlider.addEventListener('input', e => updateGuests(e.target.value));
 calcSlider.addEventListener('input', e => updateGuests(e.target.value));
+globalBedsSlider.addEventListener('input', e => updateBeds(e.target.value));
 
 ['calcDay', 'calcSeason', 'calcChildren'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderCalculator);
@@ -1496,6 +1576,8 @@ document.getElementById('globalGuests').value = guestCount;
 document.getElementById('globalGuestsVal').textContent = guestCount;
 document.getElementById('calcGuests').value = guestCount;
 document.getElementById('calcGuestsVal').textContent = guestCount;
+document.getElementById('globalBeds').value = bedCount;
+document.getElementById('globalBedsVal').textContent = bedCount;
 
 renderCompareTable();
 renderDistanceCards();

@@ -15,7 +15,8 @@
   },
   "capacity": {
     "min": 100,
-    "max": null,
+    "max": 140,
+    "maxNote": "126–140 os.",
     "minNote": "Min. 100 os. (kwi-paź), 60 os. (lis-mar)"
   },
   "pricing": {
@@ -81,11 +82,9 @@
     "description": "1 kelner na 20 osób, w cenie"
   },
   "dataGaps": [
-    "Max pojemność sali",
     "Godz. zakończenia/nadgodziny"
   ],
   "questionsToAsk": [
-    "Jaka jest maksymalna pojemność sali? Czy 150 osób się zmieści?",
     "O której godzinie standardowo kończy się wesele i jaka jest cena za nadgodziny?"
   ]
 }

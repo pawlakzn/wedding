@@ -36,7 +36,8 @@
   "children": {
     "freeUpTo": 3,
     "discountUpTo": 8,
-    "discountPercent": 60
+    "discountPercent": 40,
+    "description": "Do 3 lat: gratis. 3-8 lat: 60% ceny menu (rabat 40%)."
   },
   "rooms": {
     "count": 58,

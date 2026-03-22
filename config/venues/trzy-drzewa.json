@@ -15,7 +15,7 @@
     "website": "https://trzydrzewa.com/"
   },
   "capacity": {
-    "min": null,
+    "min": 100,
     "max": 180
   },
   "pricing": {
@@ -110,12 +110,10 @@
     }
   ],
   "dataGaps": [
-    "Min. gości",
     "Zaliczka",
     "Godz. zakończenia/nadgodziny"
   ],
   "questionsToAsk": [
-    "Jaka jest minimalna liczba gości?",
     "Jak wygląda struktura zaliczki (kwota, terminy)?",
     "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
     "Jakie są dostępne terminy na 2026 rok?"
