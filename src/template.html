@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porównanie sal weselnych</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  #mapContainer { height: 500px; }
+  @media print {
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    body { font-size: 12px; }
+    .venue-card { break-inside: avoid; }
+  }
+  .print-only { display: none; }
+  .bar-fill { transition: width 0.5s ease; }
+  .sort-arrow::after { content: ' ↕'; opacity: 0.3; }
+  .sort-arrow.asc::after { content: ' ↑'; opacity: 1; }
+  .sort-arrow.desc::after { content: ' ↓'; opacity: 1; }
+  .tooltip { position: relative; }
+  .tooltip:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: #1f2937; color: white; padding: 4px 8px; border-radius: 4px;
+    font-size: 12px; white-space: nowrap; z-index: 50;
+  }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- NAV -->
+<nav class="sticky top-0 z-40 bg-white shadow-sm no-print">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+    <h1 class="text-xl font-bold text-rose-700">Porównanie sal weselnych</h1>
+    <div class="flex flex-wrap gap-3 text-sm">
+      <a href="#porownanie" class="hover:text-rose-600">Tabela</a>
+      <a href="#odleglosci" class="hover:text-rose-600">Odległości</a>
+      <a href="#mapa" class="hover:text-rose-600">Mapa</a>
+      <a href="#kalkulator" class="hover:text-rose-600">Kalkulator</a>
+      <a href="#sale" class="hover:text-rose-600">Sale</a>
+      <a href="#pytania" class="hover:text-rose-600">Pytania</a>
+      <a href="#braki" class="hover:text-rose-600">Kompletność</a>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <label>Gości:</label>
+      <input type="range" id="globalGuests" min="60" max="250" value="150" class="w-28">
+      <span id="globalGuestsVal" class="font-bold text-rose-700 w-8">150</span>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-12">
+
+<!-- TABELA PORÓWNAWCZA -->
+<section id="porownanie">
+  <h2 class="text-2xl font-bold mb-4">Tabela porównawcza</h2>
+  <div class="overflow-x-auto">
+    <table id="compareTable" class="w-full text-sm bg-white rounded-lg shadow">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-3 py-2 text-left cursor-pointer sort-arrow" data-col="name">Sala</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="perPerson">Cena/os</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="menuCost">Menu (150 os.)</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="totalCost">Koszt całk.</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="capacity">Pojemność</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="beds">Noclegi</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="distWro">z Wrocławia</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="distWie">z Wieruszowa</th>
+          <th class="px-3 py-2 text-right cursor-pointer sort-arrow" data-col="hall">Wynajem sali</th>
+          <th class="px-3 py-2 text-left">Zaliczka</th>
+        </tr>
+      </thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ODLEGŁOŚCI -->
+<section id="odleglosci">
+  <h2 class="text-2xl font-bold mb-4">Odległości</h2>
+  <p class="text-sm text-gray-500 mb-4">Czas dojazdu samochodem z dwóch lokalizacji. Średnia ważona: 50% Wrocław + 50% Wieruszów.</p>
+  <div id="distanceCards" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+<!-- MAPA -->
+<section id="mapa">
+  <h2 class="text-2xl font-bold mb-2">Mapa</h2>
+  <p class="text-sm text-gray-500 mb-4">Lokalizacje sal weselnych względem Wrocławia i Wieruszowa.</p>
+  <div id="mapContainer" class="rounded-lg shadow overflow-hidden"></div>
+</section>
+
+<!-- KALKULATOR -->
+<section id="kalkulator">
+  <h2 class="text-2xl font-bold mb-4">Kalkulator kosztów</h2>
+  <p class="text-xs text-gray-500 mb-3">Szacunkowy koszt — nie dokładna wycena. Poprawiny nie są uwzględniane.</p>
+  <div class="bg-white rounded-lg shadow p-4 mb-4">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Liczba gości</label>
+        <input type="range" id="calcGuests" min="60" max="250" value="150" class="w-full">
+        <div class="text-center font-bold text-rose-700" id="calcGuestsVal">150</div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Dzień tygodnia</label>
+        <select id="calcDay" class="w-full border rounded px-2 py-1">
+          <option value="saturday">Sobota</option>
+          <option value="friday">Piątek</option>
+          <option value="weekday">Pon-Czw</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Sezon</label>
+        <select id="calcSeason" class="w-full border rounded px-2 py-1">
+          <option value="peak">Maj-Wrzesień (szczyt)</option>
+          <option value="offpeak">Sty-Kwi, Paź-Gru (poza sezonem)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Dzieci (w liczbie gości)</label>
+        <input type="number" id="calcChildren" min="0" max="50" value="0" class="w-full border rounded px-2 py-1">
+      </div>
+    </div>
+  </div>
+  <div id="calcResults" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+<!-- KARTY SZCZEGÓŁOWE -->
+<section id="sale">
+  <h2 class="text-2xl font-bold mb-4">Szczegóły sal</h2>
+  <div id="venueCards" class="space-y-8"></div>
+</section>
+
+<!-- PYTANIA -->
+<section id="pytania">
+  <h2 class="text-2xl font-bold mb-4">Pytania do sal</h2>
+  <p class="text-sm text-gray-500 mb-4">Zaznacz pytania, na które już masz odpowiedź. Stan zapisuje się automatycznie.</p>
+  <div class="print-only text-center mb-4"><strong>Lista pytań do sal weselnych</strong></div>
+  <div id="questionsList" class="space-y-6"></div>
+</section>
+
+<!-- KOMPLETNOŚĆ -->
+<section id="braki">
+  <h2 class="text-2xl font-bold mb-4">Kompletność danych</h2>
+  <div class="overflow-x-auto">
+    <table id="completenessTable" class="w-full text-sm bg-white rounded-lg shadow">
+      <thead class="bg-gray-100"><tr id="completenessHeader"></tr></thead>
+      <tbody id="completenessBody"></tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer class="no-print text-center text-xs text-gray-400 py-6">
+  Ostatnia aktualizacja danych: {{LAST_UPDATED}}
+</footer>
+
+<script>
+// ===== DANE (generowane przez build.js — nie edytuj ręcznie) =====
+// __VENUES_DATA__
+
+const V = VENUES_DATA.venues;
+
+// ===== STATE =====
+let guestCount = VENUES_DATA.meta.defaultGuests;
+let sortCol = null;
+let sortDir = 'asc';
+
+// ===== HELPERS =====
+function fmt(n) { return n == null ? '—' : n.toLocaleString('pl-PL'); }
+function fmtPLN(n) { return n == null ? '—' : n.toLocaleString('pl-PL') + ' zł'; }
+function fmtTime(min) {
+  if (min == null) return '—';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h > 0 ? `${h}h ${m > 0 ? m + 'min' : ''}` : `${m} min`;
+}
+function getPerPerson(v) { return v.pricing.perPerson; }
+function getMenuCost(v, guests) {
+  const pp = getPerPerson(v);
+  if (pp == null) return null;
+  return pp * guests;
+}
+function getTotalCost(v, guests) {
+  const menu = getMenuCost(v, guests);
+  if (menu == null) return null;
+  const hall = v.pricing.hallRental || v.pricing.flatFee || 0;
+  const mandatory = (v.pricing.mandatoryFees || []).reduce((s, f) => s + (f.price || 0), 0);
+  return menu + hall + mandatory;
+}
+function getBeds(v) { return v.rooms.totalBeds; }
+function getHall(v) {
+  return v.pricing.hallRental || v.pricing.hallRentalSaturday || null;
+}
+function getDeposit(v) { return v.deposit.structure || v.deposit.description || null; }
+function warn(cond) { return cond ? '<span class="text-amber-600 font-bold" title="Uwaga">⚠</span>' : ''; }
+
+// ===== COMPARISON TABLE =====
+function renderCompareTable() {
+  const body = document.getElementById('compareBody');
+  const prices = V.map(getPerPerson).filter(x => x != null);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  let rows = V.map(v => {
+    const pp = getPerPerson(v);
+    const mc = getMenuCost(v, guestCount);
+    const tc = getTotalCost(v, guestCount);
+    const cap = v.capacity.max;
+    const b = getBeds(v);
+    const bNearby = (v.nearbyAccommodation || []).reduce((s, a) => s + (a.beds || 0), 0);
+    const dw = v.distance.fromWroclaw.minutes;
+    const dwi = v.distance.fromWieruszow.minutes;
+    return { v, pp, mc, tc, cap, b, bNearby, dw, dwi, hall: getHall(v), deposit: getDeposit(v) };
+  });
+
+  if (sortCol) {
+    const key = { name: r => r.v.name, perPerson: r => r.pp, menuCost: r => r.mc, totalCost: r => r.tc, capacity: r => r.cap, beds: r => r.b, distWro: r => r.dw, distWie: r => r.dwi, hall: r => r.hall }[sortCol];
+    if (key) {
+      rows.sort((a, b) => {
+        const va = key(a), vb = key(b);
+        if (va == null && vb == null) return 0;
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        return sortDir === 'asc' ? va - vb : vb - va;
+      });
+    }
+  }
+
+  const menus = rows.map(r => r.mc).filter(x => x != null);
+  const minMenu = Math.min(...menus);
+  const maxMenu = Math.max(...menus);
+  const totals = rows.map(r => r.tc).filter(x => x != null);
+  const minTotal = Math.min(...totals);
+  const maxTotal = Math.max(...totals);
+
+  body.innerHTML = rows.map(r => {
+    const v = r.v;
+    const priceClass = r.pp === minPrice ? 'text-green-700 font-bold' : r.pp === maxPrice ? 'text-red-600' : '';
+    const menuClass = r.mc === minMenu ? 'text-green-700 font-bold' : r.mc === maxMenu ? 'text-red-600' : '';
+    const totalClass = r.tc === minTotal ? 'text-green-700 font-bold' : r.tc === maxTotal ? 'text-red-600' : '';
+    const bedWarn = (r.b != null && r.b < 25) ? warn(true) : (r.b == null ? warn(true) : '');
+    const capWarn = (r.cap != null && r.cap < 150) ? warn(true) : (r.cap == null ? warn(true) : '');
+    const yearWarn = v.pricing.year < 2026 ? ' <span class="text-xs text-amber-600">('+v.pricing.year+'!)</span>' : '';
+
+    return `<tr class="border-t hover:bg-rose-50 cursor-pointer" onclick="document.getElementById('card-${v.id}').scrollIntoView({behavior:'smooth'})">
+      <td class="px-3 py-2 font-medium">${v.name}</td>
+      <td class="px-3 py-2 text-right ${priceClass}">${fmtPLN(r.pp)}${yearWarn}</td>
+      <td class="px-3 py-2 text-right ${menuClass}">${fmtPLN(r.mc)}</td>
+      <td class="px-3 py-2 text-right ${totalClass}">${fmtPLN(r.tc)}</td>
+      <td class="px-3 py-2 text-right">${fmt(r.cap)} ${capWarn}</td>
+      <td class="px-3 py-2 text-right">${fmt(r.b)} ${bedWarn}${r.bNearby > 0 ? ' <span class="text-gray-400">(+' + r.bNearby + ')</span>' : ''}</td>
+      <td class="px-3 py-2 text-right">${r.dw} min (${v.distance.fromWroclaw.km} km)</td>
+      <td class="px-3 py-2 text-right">${r.dwi} min (${v.distance.fromWieruszow.km} km)</td>
+      <td class="px-3 py-2 text-right">${fmtPLN(r.hall)}</td>
+      <td class="px-3 py-2 text-sm">${r.deposit || '<span class="text-gray-400">brak danych</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== DISTANCE CARDS =====
+function renderDistanceCards() {
+  const el = document.getElementById('distanceCards');
+  const maxMin = Math.max(...V.map(v => Math.max(v.distance.fromWroclaw.minutes, v.distance.fromWieruszow.minutes)));
+
+  const sorted = [...V].sort((a, b) => {
+    const avgA = (a.distance.fromWroclaw.minutes + a.distance.fromWieruszow.minutes) / 2;
+    const avgB = (b.distance.fromWroclaw.minutes + b.distance.fromWieruszow.minutes) / 2;
+    return avgA - avgB;
+  });
+
+  el.innerHTML = sorted.map((v, i) => {
+    const avg = Math.round((v.distance.fromWroclaw.minutes + v.distance.fromWieruszow.minutes) / 2);
+    const wPct = Math.round(v.distance.fromWroclaw.minutes / maxMin * 100);
+    const wiPct = Math.round(v.distance.fromWieruszow.minutes / maxMin * 100);
+    const medal = i === 0 ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Najwygodniejsza</span>' : '';
+
+    return `<div class="bg-white rounded-lg shadow p-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold">${v.name}</h3>
+        <div class="text-sm text-gray-500">śr. ${avg} min ${medal}</div>
+      </div>
+      <div class="space-y-2 text-sm">
+        <div>
+          <div class="flex justify-between"><span>z Wrocławia</span><span class="font-medium">${fmtTime(v.distance.fromWroclaw.minutes)} / ${v.distance.fromWroclaw.km} km</span></div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mt-1"><div class="bg-rose-500 h-2 rounded-full bar-fill" style="width:${wPct}%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between"><span>z Wieruszowa</span><span class="font-medium">${fmtTime(v.distance.fromWieruszow.minutes)} / ${v.distance.fromWieruszow.km} km</span></div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mt-1"><div class="bg-blue-500 h-2 rounded-full bar-fill" style="width:${wiPct}%"></div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MAP =====
+let _mapInstance = null;
+function renderMap() {
+  if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
+
+  const origins = VENUES_DATA.meta.origins;
+  const allLats = V.map(v => v.coordinates.lat).concat(origins.wroclaw.lat, origins.wieruszow.lat);
+  const allLngs = V.map(v => v.coordinates.lng).concat(origins.wroclaw.lng, origins.wieruszow.lng);
+  const centerLat = (Math.min(...allLats) + Math.max(...allLats)) / 2;
+  const centerLng = (Math.min(...allLngs) + Math.max(...allLngs)) / 2;
+
+  _mapInstance = L.map('mapContainer').setView([centerLat, centerLng], 8);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(_mapInstance);
+
+  const cityIcon = L.divIcon({
+    html: '<div style="background:#3b82f6;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>',
+    className: '', iconAnchor: [8, 8], popupAnchor: [0, -10]
+  });
+  const venueIcon = L.divIcon({
+    html: '<div style="background:#e11d48;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>',
+    className: '', iconAnchor: [8, 8], popupAnchor: [0, -10]
+  });
+
+  L.marker([origins.wroclaw.lat, origins.wroclaw.lng], { icon: cityIcon })
+    .addTo(_mapInstance)
+    .bindPopup(`<strong>${origins.wroclaw.label}</strong>`);
+  L.marker([origins.wieruszow.lat, origins.wieruszow.lng], { icon: cityIcon })
+    .addTo(_mapInstance)
+    .bindPopup(`<strong>${origins.wieruszow.label}</strong>`);
+
+  V.forEach(v => {
+    if (!v.coordinates) return;
+    const popup = `<strong>${v.name}</strong><br>${v.address}<br><span style="color:#6b7280;font-size:12px">z Wrocławia: ${fmtTime(v.distance.fromWroclaw.minutes)} / ${v.distance.fromWroclaw.km} km<br>z Wieruszowa: ${fmtTime(v.distance.fromWieruszow.minutes)} / ${v.distance.fromWieruszow.km} km</span>`;
+    L.marker([v.coordinates.lat, v.coordinates.lng], { icon: venueIcon })
+      .addTo(_mapInstance)
+      .bindPopup(popup);
+  });
+
+  setTimeout(() => _mapInstance.invalidateSize(), 100);
+}
+
+// ===== CALCULATOR =====
+function renderCalculator() {
+  const el = document.getElementById('calcResults');
+  const guests = parseInt(document.getElementById('calcGuests').value);
+  const day = document.getElementById('calcDay').value;
+  const season = document.getElementById('calcSeason').value;
+  const children = parseInt(document.getElementById('calcChildren').value) || 0;
+  const adults = guests - children;
+
+  const results = V.map(v => {
+    const pp = getPerPerson(v);
+    if (pp == null) return { v, total: null, breakdown: 'Brak danych cenowych' };
+
+    let discount = 0;
+    if (v.discounts.length > 0) {
+      if (day === 'friday' || day === 'weekday') {
+        const dayDisc = v.discounts.find(d => d.type === 'dzień');
+        if (dayDisc) discount = Math.max(discount, dayDisc.value);
+      }
+      if (season === 'offpeak') {
+        const seaDisc = v.discounts.find(d => d.type === 'sezon');
+        if (seaDisc) discount = Math.max(discount, seaDisc.value);
+      }
+    }
+
+    const effectivePP = Math.round(pp * (1 - discount / 100));
+
+    let childrenCost = 0;
+    if (children > 0 && v.children.discountPercent != null) {
+      childrenCost = Math.round(effectivePP * (1 - v.children.discountPercent / 100)) * children;
+    } else {
+      childrenCost = effectivePP * children;
+    }
+    const adultCost = effectivePP * adults;
+    const menuCost = adultCost + childrenCost;
+
+    let hallCost = 0;
+    if (day === 'friday' && v.pricing.hallRentalFriday) hallCost = v.pricing.hallRentalFriday;
+    else if (v.pricing.hallRental) hallCost = v.pricing.hallRental;
+    else if (v.pricing.hallRentalSaturday) hallCost = v.pricing.hallRentalSaturday;
+    else if (v.pricing.flatFee) hallCost = v.pricing.flatFee;
+
+    const alcoholService = (v.alcoholPolicy.serviceFee || 0) * guests;
+    const roomEstimate = v.rooms.totalBeds && v.rooms.pricePerNight ? Math.min(25, v.rooms.totalBeds) * v.rooms.pricePerNight : 0;
+
+    const total = menuCost + hallCost + alcoholService + roomEstimate;
+
+    let breakdown = `Menu: ${adults} dorosłych x ${fmtPLN(effectivePP)}`;
+    if (children > 0) breakdown += ` + ${children} dzieci`;
+    if (discount > 0) breakdown += ` (rabat ${discount}%)`;
+    breakdown += ` = ${fmtPLN(menuCost)}`;
+    if (hallCost) breakdown += `\nSala: ${fmtPLN(hallCost)}`;
+    if (alcoholService) breakdown += `\nSerwis alkoholu: ${fmtPLN(alcoholService)}`;
+    if (roomEstimate) breakdown += `\nNoclegi (szac. 25 os.): ${fmtPLN(roomEstimate)}`;
+
+    return { v, total, effectivePP, menuCost, hallCost, alcoholService, roomEstimate, breakdown, discount };
+  });
+
+  const totals = results.filter(r => r.total != null).map(r => r.total);
+  const minT = Math.min(...totals);
+  const maxT = Math.max(...totals);
+
+  el.innerHTML = results.map(r => {
+    const v = r.v;
+    const borderColor = r.total === minT ? 'border-green-500' : r.total === maxT ? 'border-red-400' : 'border-gray-200';
+    const badge = r.total === minT ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Najtańsze</span>' : '';
+    const yearWarn = v.pricing.year < 2026 ? '<div class="text-xs text-amber-600 mt-1">Ceny z ' + v.pricing.year + ' — mogą być wyższe!</div>' : '';
+
+    return `<div class="bg-white rounded-lg shadow p-4 border-l-4 ${borderColor}">
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="font-bold">${v.name}</h3>
+        ${badge}
+      </div>
+      <div class="text-2xl font-bold ${r.total === minT ? 'text-green-700' : r.total === maxT ? 'text-red-600' : 'text-gray-800'}">${fmtPLN(r.total)}</div>
+      ${yearWarn}
+      <pre class="text-xs text-gray-600 mt-2 whitespace-pre-wrap font-sans">${r.breakdown}</pre>
+    </div>`;
+  }).join('');
+}
+
+// ===== VENUE CARDS =====
+function renderVenueCards() {
+  const el = document.getElementById('venueCards');
+  el.innerHTML = V.map(v => {
+    const pp = getPerPerson(v);
+    const tc = getTotalCost(v, guestCount);
+    const bedsMet = v.rooms.meetsMinimum25;
+    const bedLabel = bedsMet === true ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Min. 25 — OK</span>' :
+                     bedsMet === false ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">Poniżej 25!</span>' :
+                     '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full">Brak danych</span>';
+    const yearWarn = v.pricing.year < 2026 ? '<span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full ml-2">Ceny z ' + v.pricing.year + '!</span>' : '';
+
+    const contactHtml = [
+      v.contact.person ? `<strong>${v.contact.person}</strong>` : null,
+      v.contact.phone ? `tel: ${v.contact.phone}` : null,
+      v.contact.phone2 ? `tel2: ${v.contact.phone2}` : null,
+      v.contact.email ? `email: ${v.contact.email}` : null,
+      v.contact.instagram ? `IG: @${v.contact.instagram}` : null,
+      v.contact.website ? `<a href="${v.contact.website}" target="_blank" class="underline hover:opacity-75">${v.contact.website.replace(/^https?:\/\//, '')}</a>` : null,
+    ].filter(Boolean).join(' | ');
+
+    const gap = (val) => val == null || val === '' ? 'bg-yellow-50 text-yellow-800' : '';
+
+    return `<div id="card-${v.id}" class="venue-card bg-white rounded-lg shadow overflow-hidden">
+      <div class="bg-rose-700 text-white px-6 py-4">
+        <h3 class="text-xl font-bold">${v.name}${yearWarn}</h3>
+        <div class="text-sm opacity-90">${v.address}</div>
+        <div class="text-sm opacity-80 mt-1">${contactHtml}</div>
+      </div>
+      <div class="p-6 grid gap-4 md:grid-cols-2">
+        <!-- ODLEGŁOŚCI -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Odległości</h4>
+          <div class="text-sm space-y-1">
+            <div>z Wrocławia: <strong>${fmtTime(v.distance.fromWroclaw.minutes)}</strong> (${v.distance.fromWroclaw.km} km)</div>
+            <div>z Wieruszowa: <strong>${fmtTime(v.distance.fromWieruszow.minutes)}</strong> (${v.distance.fromWieruszow.km} km)</div>
+          </div>
+        </div>
+        <!-- POJEMNOŚĆ -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Pojemność</h4>
+          <div class="text-sm ${gap(v.capacity.max)}">
+            ${v.capacity.min ? 'Min: ' + v.capacity.min + ' | ' : ''}Max: ${v.capacity.max ? v.capacity.max + ' os.' : '<span class="text-yellow-600">brak danych</span>'}
+            ${v.capacity.max && v.capacity.max < 150 ? warn(true) + ' Może być za mało na 150 gości' : ''}
+            ${v.capacity.description ? '<div class="text-xs text-gray-500">' + v.capacity.description + '</div>' : ''}
+            ${v.capacity.minNote ? '<div class="text-xs text-gray-500">' + v.capacity.minNote + '</div>' : ''}
+          </div>
+        </div>
+        <!-- CENNIK -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Cennik</h4>
+          <div class="text-sm space-y-1">
+            <div class="${gap(pp)}">Cena/os: <strong>${fmtPLN(pp)}</strong> ${v.pricing.priceNote ? '<span class="text-xs text-gray-500">(' + v.pricing.priceNote + ')</span>' : ''}</div>
+            <div>Menu na ${guestCount} gości: <strong>${fmtPLN(getMenuCost(v, guestCount))}</strong></div>
+            <div>Koszt całkowity (menu + sala + opł. stałe): <strong>${fmtPLN(tc)}</strong></div>
+            ${v.pricing.menuOptions.length > 1 ? '<div class="text-xs">Warianty: ' + v.pricing.menuOptions.map(m => m.name + ' ' + fmtPLN(m.pricePerPerson)).join(', ') + '</div>' : ''}
+            ${v.pricing.flatFee ? '<div class="font-medium">Opłata stała: ' + fmtPLN(v.pricing.flatFee) + (v.pricing.flatFeeDescription ? '<div class="text-xs text-gray-500 font-normal">' + v.pricing.flatFeeDescription + '</div>' : '') + '</div>' : ''}
+            <div class="${gap(getHall(v))}">Wynajem sali: ${getHall(v) ? fmtPLN(getHall(v)) : (v.pricing.flatFee ? '<span class="text-gray-400">wliczony w opłatę stałą</span>' : '<span class="text-yellow-600">brak danych</span>')} ${v.pricing.hallRentalDescription ? '<span class="text-xs">(' + v.pricing.hallRentalDescription + ')</span>' : ''}</div>
+            ${v.pricing.hallRentalFriday ? '<div class="text-xs">Piątek: ' + fmtPLN(v.pricing.hallRentalFriday) + ', Sobota: ' + fmtPLN(v.pricing.hallRentalSaturday) + '</div>' : ''}
+            ${v.pricing.mandatoryFees && v.pricing.mandatoryFees.length > 0 ? '<div class="mt-1 pt-1 border-t border-gray-100"><span class="text-xs font-semibold text-gray-600">Obowiązkowe opłaty dodatkowe:</span>' + v.pricing.mandatoryFees.map(f => '<div class="text-xs">' + f.name + ': ' + fmtPLN(f.price) + '/' + f.unit + '</div>').join('') + '</div>' : ''}
+          </div>
+        </div>
+        <!-- ZALICZKA -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Zaliczka</h4>
+          <div class="text-sm ${gap(v.deposit.structure)}">${v.deposit.structure || '<span class="text-yellow-600">brak danych</span>'}
+            ${v.deposit.description ? '<div class="text-xs text-gray-500">' + v.deposit.description + '</div>' : ''}
+          </div>
+          ${v.discounts.length > 0 ? '<h4 class="font-bold text-sm uppercase text-gray-500 mt-3 mb-1">Rabaty</h4>' + v.discounts.map(d => '<div class="text-sm">' + d.value + '% — ' + d.condition + '</div>').join('') : ''}
+        </div>
+        <!-- DZIECI -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Dzieci</h4>
+          <div class="text-sm ${gap(v.children.freeUpTo)}">
+            ${v.children.freeUpTo != null ? 'Do ' + v.children.freeUpTo + ' lat: gratis' : '<span class="text-yellow-600">brak danych</span>'}
+            ${v.children.discountUpTo != null ? '<br>Do ' + v.children.discountUpTo + ' lat: -' + v.children.discountPercent + '%' : ''}
+          </div>
+        </div>
+        <!-- NOCLEGI -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Noclegi ${bedLabel}</h4>
+          <div class="text-sm">${v.rooms.description}</div>
+          ${v.rooms.priceOptions ? '<div class="text-xs mt-1">' + v.rooms.priceOptions.map(p => p.type + ': ' + fmtPLN(p.price)).join(', ') + '</div>' : ''}
+          ${v.nearbyAccommodation && v.nearbyAccommodation.length > 0 ? '<div class="mt-2 text-xs text-gray-500 uppercase font-semibold mb-1">Pobliskie</div>' + v.nearbyAccommodation.map(a => '<div class="text-sm mb-1"><strong>' + a.name + '</strong>' + (a.rooms != null ? ' — ' + a.rooms + ' pok., ' + a.beds + ' miejsc' : '') + (a.links && a.links.booking ? ' <a href="' + a.links.booking + '" target="_blank" class="text-blue-600 hover:underline text-xs">[Booking]</a>' : '') + (a.links && a.links.facebook ? ' <a href="' + a.links.facebook + '" target="_blank" class="text-blue-600 hover:underline text-xs">[FB]</a>' : '') + '</div>').join('') : ''}
+        </div>
+        <!-- CO W CENIE -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">W cenie</h4>
+          <div class="text-sm ${v.includes.length === 0 ? gap(null) : ''}">
+            ${v.includes.length > 0 ? '<ul class="list-disc list-inside text-xs space-y-0.5">' + v.includes.map(i => '<li>' + i + '</li>').join('') + '</ul>' : '<span class="text-yellow-600">brak danych</span>'}
+          </div>
+        </div>
+        <!-- DODATKI -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Dodatki</h4>
+          ${v.extras.length > 0 ? '<ul class="text-xs space-y-0.5">' + v.extras.map(e => '<li>' + e.name + (e.price ? ': ' + fmtPLN(e.price) + '/' + e.unit : ' — ' + e.unit) + '</li>').join('') + '</ul>' : '<span class="text-sm text-gray-400">—</span>'}
+        </div>
+        <!-- ALKOHOL -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Alkohol</h4>
+          <div class="text-sm ${gap(v.alcoholPolicy.description)}">
+            ${v.alcoholPolicy.description || '<span class="text-yellow-600">brak danych</span>'}
+          </div>
+        </div>
+        <!-- CZAS -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Czas</h4>
+          <div class="text-sm ${gap(v.timing.endTime)}">
+            Zakończenie: ${v.timing.endTime || '<span class="text-yellow-600">brak danych</span>'}
+            ${v.timing.overtimePrice ? '<br>Nadgodziny: ' + fmtPLN(v.timing.overtimePrice) + ' ' + (v.timing.overtimeUnit || '') : ''}
+          </div>
+        </div>
+        <!-- OBSŁUGA -->
+        <div>
+          <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Obsługa</h4>
+          <div class="text-sm ${gap(v.staffing.ratio)}">
+            ${v.staffing.description || '<span class="text-yellow-600">brak danych</span>'}
+          </div>
+        </div>
+      </div>
+      <!-- BRAKI -->
+      ${v.dataGaps.length > 0 ? '<div class="px-6 pb-4"><div class="bg-yellow-50 border border-yellow-200 rounded p-3"><h4 class="font-bold text-sm text-yellow-800 mb-1">Brakujące dane (' + v.dataGaps.length + ')</h4><div class="text-xs text-yellow-700">' + v.dataGaps.join(' | ') + '</div></div></div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+// ===== QUESTIONS =====
+function renderQuestions() {
+  const el = document.getElementById('questionsList');
+  const saved = JSON.parse(localStorage.getItem('weddingQuestions') || '{}');
+
+  el.innerHTML = V.map(v => {
+    if (v.questionsToAsk.length === 0) return '';
+    const answered = Object.keys(saved).filter(k => k.startsWith(v.id + '_') && saved[k]).length;
+    const total = v.questionsToAsk.length;
+    const pct = Math.round(answered / total * 100);
+
+    return `<div class="bg-white rounded-lg shadow p-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-lg">${v.name}</h3>
+        <div class="text-sm">
+          <span class="${pct === 100 ? 'text-green-600' : 'text-gray-500'}">${answered}/${total}</span>
+          <div class="w-24 bg-gray-200 rounded-full h-1.5 inline-block ml-2 align-middle">
+            <div class="bg-green-500 h-1.5 rounded-full" style="width:${pct}%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        ${v.questionsToAsk.map((q, i) => {
+          const key = v.id + '_' + i;
+          const checked = saved[key] ? 'checked' : '';
+          return `<label class="flex items-start gap-2 text-sm ${saved[key] ? 'line-through text-gray-400' : ''}">
+            <input type="checkbox" ${checked} onchange="toggleQuestion('${key}', this)" class="mt-0.5 shrink-0">
+            <span>${q}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="mt-3 text-xs text-gray-500">tel: ${v.contact.phone}${v.contact.email ? ' | ' + v.contact.email : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleQuestion(key, cb) {
+  const saved = JSON.parse(localStorage.getItem('weddingQuestions') || '{}');
+  saved[key] = cb.checked;
+  localStorage.setItem('weddingQuestions', JSON.stringify(saved));
+  renderQuestions();
+}
+
+// ===== COMPLETENESS =====
+function renderCompleteness() {
+  const fields = [
+    { key: 'perPerson', label: 'Cena/os', get: v => v.pricing.perPerson },
+    { key: 'capacity', label: 'Pojemność max', get: v => v.capacity.max },
+    { key: 'beds', label: 'Noclegi/łóżka', get: v => v.rooms.totalBeds },
+    { key: 'hall', label: 'Wynajem sali', get: v => getHall(v) },
+    { key: 'deposit', label: 'Zaliczka', get: v => v.deposit.structure },
+    { key: 'children', label: 'Dzieci cennik', get: v => v.children.freeUpTo },
+    { key: 'alcohol', label: 'Alkohol', get: v => v.alcoholPolicy.description },
+    { key: 'endTime', label: 'Godz. zakończenia', get: v => v.timing.endTime },
+    { key: 'overtime', label: 'Nadgodziny', get: v => v.timing.overtimePrice },
+    { key: 'staffing', label: 'Obsługa', get: v => v.staffing.ratio || v.staffing.description },
+    { key: 'discounts', label: 'Rabaty', get: v => v.discounts.length > 0 ? true : null },
+  ];
+
+  const header = document.getElementById('completenessHeader');
+  header.innerHTML = '<th class="px-3 py-2 text-left">Pole</th>' + V.map(v => `<th class="px-3 py-2 text-center text-xs">${v.name}</th>`).join('');
+
+  const body = document.getElementById('completenessBody');
+  body.innerHTML = fields.map(f => {
+    return `<tr class="border-t">
+      <td class="px-3 py-1.5 text-sm">${f.label}</td>
+      ${V.map(v => {
+        const val = f.get(v);
+        const has = val != null && val !== '' && val !== false;
+        return `<td class="px-3 py-1.5 text-center">${has ? '<span class="text-green-600">&#10003;</span>' : '<span class="text-red-400">&#10007;</span>'}</td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
+
+  const summaryRow = `<tr class="border-t-2 border-gray-300 font-bold">
+    <td class="px-3 py-2 text-sm">Kompletność</td>
+    ${V.map(v => {
+      const filled = fields.filter(f => { const val = f.get(v); return val != null && val !== '' && val !== false; }).length;
+      const pct = Math.round(filled / fields.length * 100);
+      const color = pct >= 80 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
+      return `<td class="px-3 py-2 text-center ${color}">${pct}%</td>`;
+    }).join('')}
+  </tr>`;
+  body.innerHTML += summaryRow;
+}
+
+// ===== SORTING =====
+document.querySelectorAll('#compareTable th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortCol = col;
+      sortDir = 'asc';
+    }
+    document.querySelectorAll('#compareTable th').forEach(h => h.classList.remove('asc', 'desc'));
+    th.classList.add(sortDir);
+    renderCompareTable();
+  });
+});
+
+// ===== GUEST SLIDER SYNC =====
+const globalSlider = document.getElementById('globalGuests');
+const globalVal = document.getElementById('globalGuestsVal');
+const calcSlider = document.getElementById('calcGuests');
+const calcVal = document.getElementById('calcGuestsVal');
+
+function updateGuests(val) {
+  guestCount = parseInt(val);
+  globalSlider.value = val;
+  globalVal.textContent = val;
+  calcSlider.value = val;
+  calcVal.textContent = val;
+  renderCompareTable();
+  renderVenueCards();
+  renderCalculator();
+}
+
+globalSlider.addEventListener('input', e => updateGuests(e.target.value));
+calcSlider.addEventListener('input', e => updateGuests(e.target.value));
+
+['calcDay', 'calcSeason', 'calcChildren'].forEach(id => {
+  document.getElementById(id).addEventListener('change', renderCalculator);
+});
+document.getElementById('calcChildren').addEventListener('input', renderCalculator);
+
+// ===== INIT =====
+document.getElementById('globalGuests').value = guestCount;
+document.getElementById('globalGuestsVal').textContent = guestCount;
+document.getElementById('calcGuests').value = guestCount;
+document.getElementById('calcGuestsVal').textContent = guestCount;
+
+renderCompareTable();
+renderDistanceCards();
+renderMap();
+renderCalculator();
+renderVenueCards();
+renderQuestions();
+renderCompleteness();
+</script>
+</body>
+</html>

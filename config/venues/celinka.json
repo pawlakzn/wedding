@@ -1,0 +1,91 @@
+{
+  "id": "celinka",
+  "name": "Celinka",
+  "address": "Kochłowy 58, 63-500 Ostrzeszów",
+  "coordinates": { "lat": 51.3980, "lng": 18.0900 },
+  "distance": {
+    "fromWroclaw": { "km": 170, "minutes": 120 },
+    "fromWieruszow": { "km": 45, "minutes": 45 }
+  },
+  "contact": {
+    "person": "Aga Heflik",
+    "phone": "794 581 431",
+    "email": "aga.heflik@gmail.com",
+    "instagram": null
+  },
+  "capacity": {
+    "min": 100,
+    "max": null,
+    "minNote": "Min. 100 os. (kwi-paź), 60 os. (lis-mar)"
+  },
+  "pricing": {
+    "perPerson": 430,
+    "year": 2026,
+    "menuOptions": [
+      { "name": "Menu standardowe", "pricePerPerson": 430 }
+    ],
+    "hallRentalSaturday": 3000,
+    "hallRentalFriday": 2000,
+    "hallRental": 3000
+  },
+  "deposit": {
+    "structure": "10-15% ceny wesela",
+    "description": "Przy podpisaniu umowy. Bezpłatna rezerwacja terminu na 2 tygodnie."
+  },
+  "discounts": [],
+  "children": {
+    "freeUpTo": 4,
+    "discountUpTo": 7,
+    "discountPercent": 50
+  },
+  "rooms": {
+    "count": null,
+    "totalBeds": 42,
+    "totalBedsWinter": 33,
+    "pricePerNight": 120,
+    "pricePerNightPremium": 160,
+    "breakfastIncluded": true,
+    "brideGroomFree": null,
+    "meetsMinimum25": true,
+    "description": "42 miejsca (lato) / 33 miejsca (zima). Domki 120 zł/os, Górka 160 zł/os ze śniadaniem."
+  },
+  "includes": [
+    "Obsługa kelnerska (1:20)",
+    "Przywitanie chlebem i solą",
+    "Stół wiejski (własne wędliny)",
+    "Opiekun wesela",
+    "Chłodzenie napojów, podawanie wódki",
+    "Klimatyzacja/ogrzewanie",
+    "Agregat prądotwórczy"
+  ],
+  "extras": [
+    { "name": "Stół herbaciano-kawowy z ekspresem", "price": 600, "unit": "ryczałt" },
+    { "name": "Napis TAŃCE", "price": 300, "unit": "ryczałt" },
+    { "name": "Beczka piwa Pinta", "price": 8, "unit": "0,5l" },
+    { "name": "Wynajem nalewaka do piwa", "price": 300, "unit": "ryczałt" },
+    { "name": "Stół alkoholowy (szkło, lód, cytryna)", "price": 300, "unit": "ryczałt" },
+    { "name": "Stół słodki na paterach", "price": 300, "unit": "ryczałt" }
+  ],
+  "alcoholPolicy": {
+    "corkageFee": false,
+    "selfSupply": true,
+    "serviceFee": 0,
+    "description": "Bez korkowego! Własny alkohol. Wódka mrożona i podawana przez kelnerów gratis."
+  },
+  "timing": {
+    "endTime": null,
+    "overtimePrice": null
+  },
+  "staffing": {
+    "ratio": "1:20",
+    "description": "1 kelner na 20 osób, w cenie"
+  },
+  "dataGaps": [
+    "Max pojemność sali",
+    "Godz. zakończenia/nadgodziny"
+  ],
+  "questionsToAsk": [
+    "Jaka jest maksymalna pojemność sali? Czy 150 osób się zmieści?",
+    "O której godzinie standardowo kończy się wesele i jaka jest cena za nadgodziny?"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "lastUpdated": "2026-03-19",
+    "defaultGuests": 150
+  },
+  "venueOrder": [
+    "trzy-drzewa",
+    "folwark-machnice",
+    "celinka",
+    "aroma-stone",
+    "szklana-czajka"
+  ],
+  "origins": {
+    "wroclaw": {
+      "label": "Wrocław (Reymonta 10H)",
+      "lat": 51.1079,
+      "lng": 17.0385
+    },
+    "wieruszow": {
+      "label": "Wieruszów (Lubczyna 8B)",
+      "lat": 51.2957,
+      "lng": 18.1536
+    }
+  }
+}

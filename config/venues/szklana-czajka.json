@@ -1,0 +1,95 @@
+{
+  "id": "szklana-czajka",
+  "name": "Szklana Czajka",
+  "address": "Czajków 160a, 63-524 Czajków",
+  "coordinates": { "lat": 51.5016, "lng": 18.3310 },
+  "distance": {
+    "fromWroclaw": { "km": 175, "minutes": 120 },
+    "fromWieruszow": { "km": 30, "minutes": 30 }
+  },
+  "contact": {
+    "person": null,
+    "phone": "693 619 454",
+    "phone2": "62 731 16 15",
+    "email": "aadamus@poczta.fm",
+    "instagram": null
+  },
+  "capacity": {
+    "min": null,
+    "max": null
+  },
+  "pricing": {
+    "perPerson": 400,
+    "year": 2025,
+    "menuOptions": [
+      { "name": "Menu weselne 2025", "pricePerPerson": 400 }
+    ],
+    "hallRental": null,
+    "priceWarning": "Ceny z 2025 — mogą być wyższe w 2026!"
+  },
+  "deposit": {
+    "structure": null,
+    "description": null
+  },
+  "discounts": [],
+  "children": {
+    "freeUpTo": null,
+    "discountUpTo": null,
+    "discountPercent": null
+  },
+  "rooms": {
+    "count": null,
+    "totalBeds": null,
+    "pricePerNight": null,
+    "breakfastIncluded": null,
+    "brideGroomFree": null,
+    "meetsMinimum25": null,
+    "description": "Brak danych o noclegach."
+  },
+  "includes": [
+    "Kawa/herbata bez ograniczeń"
+  ],
+  "extras": [
+    { "name": "Ciasto/tort/owoce", "price": null, "unit": "płatne dodatkowo" },
+    { "name": "Wiejski stół", "price": null, "unit": "do wyceny" }
+  ],
+  "alcoholPolicy": {
+    "corkageFee": null,
+    "selfSupply": null,
+    "serviceFee": null
+  },
+  "timing": {
+    "endTime": null,
+    "overtimePrice": null
+  },
+  "staffing": {
+    "ratio": null,
+    "description": null
+  },
+  "dataGaps": [
+    "Pojemność min/max",
+    "Noclegi",
+    "Wynajem sali",
+    "Zaliczka",
+    "Rabaty",
+    "Dzieci",
+    "Alkohol",
+    "Co w cenie",
+    "Nadgodziny",
+    "Obsługa",
+    "Ceny 2026"
+  ],
+  "questionsToAsk": [
+    "Jaka jest pojemność sali (min. i max. liczba gości)?",
+    "Czy dysponujecie pokojami noclegowymi? Ile łóżek, jaka cena?",
+    "Jaki jest koszt wynajmu sali?",
+    "Jak wygląda struktura zaliczki?",
+    "Czy są rabaty za wesele w piątek lub poza sezonem?",
+    "Jaki jest cennik dla dzieci?",
+    "Jaka jest polityka alkoholowa — korkowe, własny alkohol?",
+    "Co dokładnie jest wliczone w cenę?",
+    "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
+    "Ilu kelnerów obsługuje wesele?",
+    "Jakie będą ceny menu na 2026?"
+  ]
+}

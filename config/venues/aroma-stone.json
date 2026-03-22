@@ -1,0 +1,104 @@
+{
+  "id": "aroma-stone",
+  "name": "Aroma Stone",
+  "address": "Szosa Kępińska 81, 56-500 Syców",
+  "coordinates": { "lat": 51.0680, "lng": 17.7300 },
+  "distance": {
+    "fromWroclaw": { "km": 100, "minutes": 75 },
+    "fromWieruszow": { "km": 80, "minutes": 60 }
+  },
+  "contact": {
+    "person": null,
+    "phone": "500 181 155",
+    "email": null,
+    "instagram": null
+  },
+  "capacity": {
+    "min": null,
+    "max": 150,
+    "description": "150 os. (std sala), do 200 os. (duża sala)"
+  },
+  "pricing": {
+    "perPerson": 365,
+    "year": 2026,
+    "menuOptions": [
+      { "name": "Menu I", "pricePerPerson": 365 },
+      { "name": "Menu II", "pricePerPerson": 399 },
+      { "name": "Menu III", "pricePerPerson": 430 }
+    ],
+    "hallRental": null
+  },
+  "deposit": {
+    "structure": "5000 zł + 30% wartości",
+    "description": "I zaliczka 5000 zł, II zaliczka 30% przy menu, reszta 3 dni przed."
+  },
+  "discounts": [],
+  "children": {
+    "freeUpTo": 3,
+    "discountUpTo": 8,
+    "discountPercent": 60
+  },
+  "rooms": {
+    "count": 58,
+    "totalBeds": 150,
+    "pricePerNight": null,
+    "priceOptions": [
+      { "type": "1-os", "price": 320 },
+      { "type": "2-os", "price": 440 },
+      { "type": "3-os", "price": 550 },
+      { "type": "4-os", "price": 650 }
+    ],
+    "breakfastIncluded": null,
+    "brideGroomFree": null,
+    "meetsMinimum25": true,
+    "description": "58 pokoi, 150 miejsc. Pokoje 2/3/4-os. Ceny: 320-650 zł/pokój."
+  },
+  "includes": [
+    "Dwa rodzaje zastawy",
+    "Oświetlenie",
+    "Obrusy, skirty, bankietówki",
+    "Klimatyzacja",
+    "Lampa wina musującego",
+    "Kawa, herbata, cytryna, mleko",
+    "Stoły okrągłe i proste"
+  ],
+  "extras": [
+    { "name": "Fontanna czekoladowa", "price": 600, "unit": "ryczałt" },
+    { "name": "Stół wiejski", "price": 40, "unit": "os." },
+    { "name": "Pokrowce na krzesła", "price": 7, "unit": "szt." },
+    { "name": "Utylizacja butelek", "price": 4, "unit": "os." }
+  ],
+  "alcoholPolicy": {
+    "corkageFee": null,
+    "selfSupply": null,
+    "serviceFee": 15,
+    "description": "Serwis alkoholu 15 zł/os (wesele), 20 zł/os (wesele+poprawiny). Napoje we własnym zakresie."
+  },
+  "timing": {
+    "endTime": "04:00",
+    "overtimePrice": 1000,
+    "overtimeUnit": "za godz. po 4:00"
+  },
+  "staffing": {
+    "ratio": null,
+    "description": null
+  },
+  "dataGaps": [
+    "Większa sala 200 os.?",
+    "Wynajem sali",
+    "Rabaty/zniżki",
+    "Min. gości",
+    "Śniadanie w cenie noclegu?",
+    "Pokój Młodej Pary gratis?",
+    "Obsługa kelnerska"
+  ],
+  "questionsToAsk": [
+    "Czy jest dodatkowy koszt wynajmu sali?",
+    "Czy są rabaty za wesele w piątek lub poza sezonem?",
+    "Jaka jest minimalna liczba gości?",
+    "Czy śniadanie jest wliczone w cenę noclegu?",
+    "Czy pokój dla Młodej Pary jest w cenie?",
+    "Ilu kelnerów obsługuje wesele na 150 osób?",
+    "Jakie są dostępne terminy na 2026?"
+  ]
+}

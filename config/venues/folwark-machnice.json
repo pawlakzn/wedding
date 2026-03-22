@@ -1,0 +1,121 @@
+{
+  "id": "folwark-machnice",
+  "name": "Folwark Machnice",
+  "address": "Machnice 8, 55-114 Wisznia Mała",
+  "coordinates": { "lat": 51.2752, "lng": 17.0600 },
+  "distance": {
+    "fromWroclaw": { "km": 20, "minutes": 25 },
+    "fromWieruszow": { "km": 200, "minutes": 135 }
+  },
+  "contact": {
+    "person": "Michał Selucha",
+    "phone": "882 164 316",
+    "email": null,
+    "instagram": "stary_folwark_machnice"
+  },
+  "capacity": {
+    "min": 80,
+    "max": 200,
+    "description": "Stary Folwark: 80-200 gości"
+  },
+  "pricing": {
+    "perPerson": 469,
+    "year": 2025,
+    "menuOptions": [
+      { "name": "100-130 osób", "pricePerPerson": 469 },
+      { "name": "Każda dodatkowa osoba (pow. 130)", "pricePerPerson": 449 }
+    ],
+    "hallRental": 7000,
+    "flatFee": 7000,
+    "flatFeeDescription": "Stała opłata 7000 zł obejmuje: wynajem sali, nocleg dla 26 osób ze śniadaniem, obsługę kelnerską, obrusy, serwety, zastawę, parking",
+    "mandatoryFees": [],
+    "priceNote": "Oferta ważna 30 dni. Ceny z 2025."
+  },
+  "deposit": {
+    "structure": null,
+    "description": null
+  },
+  "discounts": [
+    { "type": "dzień", "value": 5, "condition": "Piątek (-5% menu podstawowe)" },
+    { "type": "dzień", "value": 10, "condition": "Poniedziałek-czwartek (-10% menu podstawowe)" },
+    { "type": "sezon", "value": 10, "condition": "Listopad-kwiecień: -10% menu + -50% opłata stała" }
+  ],
+  "children": {
+    "freeUpTo": 3,
+    "discountUpTo": 12,
+    "discountPercent": 50,
+    "description": "Do 3 lat: gratis. 3-12 lat: 50% ceny. Podwykonawcy (DJ, fotograf itp.): 80% ceny."
+  },
+  "rooms": {
+    "count": null,
+    "totalBeds": 26,
+    "pricePerNight": null,
+    "breakfastIncluded": true,
+    "checkIn": "15:00",
+    "checkOut": "11:00",
+    "brideGroomFree": null,
+    "meetsMinimum25": true,
+    "description": "26 noclegów wliczonych w opłatę stałą 7000 zł (ze śniadaniem). Doba: 15:00-11:00.",
+    "extras": [
+      { "name": "Dostawka w Starym Folwarku", "price": 110, "unit": "szt." },
+      { "name": "Wcześniejsze zameldowanie", "price": 80, "unit": "pokój" },
+      { "name": "Przedłużenie doby do 15:00", "price": 80, "unit": "pokój" }
+    ]
+  },
+  "includes": [
+    "Wynajem sali",
+    "Nocleg dla 26 osób ze śniadaniem (w opłacie stałej)",
+    "Obsługa kelnerska",
+    "Klasyczne białe obrusy",
+    "Materiałowe serwety",
+    "Zastawa stołowa",
+    "Bezpłatny parking",
+    "Obsługa alkoholu klientów (chłodzenie, roznoszenie)",
+    "Przywitanie chlebem i solą",
+    "Wino musujące na przywitanie",
+    "Obiad weselny",
+    "Zimne zakąski",
+    "Dwie ciepłe kolacje",
+    "Soki (2 rodzaje) bez ograniczeń",
+    "Woda niegazowana bez ograniczeń",
+    "Kawa, herbata bez ograniczeń"
+  ],
+  "extras": [
+    { "name": "Dodatkowe danie mięsne", "price": 13, "unit": "os. (od)" },
+    { "name": "Dodatkowa skrobia", "price": 8, "unit": "os. (od)" },
+    { "name": "Dodatkowa zakąska", "price": 12, "unit": "os. (od)" },
+    { "name": "Dodatkowa kolacja", "price": 40, "unit": "os. (od)" },
+    { "name": "Kolacja w bufecie", "price": 33, "unit": "os. (od)" },
+    { "name": "Specjalność wieczoru", "price": 43, "unit": "os. (od)" },
+    { "name": "Wiejski stół", "price": 38, "unit": "os. (od)" },
+    { "name": "Przywiezienie wiejskiego stołu z zewnątrz (wydanie przez Szefa Kuchni)", "price": 500, "unit": "ryczałt" },
+    { "name": "Przywiezienie specjalności wieczoru z zewnątrz (bez podgrzania)", "price": 600, "unit": "ryczałt" },
+    { "name": "Przywiezienie specjalności wieczoru z zewnątrz (podgrzanie przez Szefa Kuchni)", "price": 800, "unit": "ryczałt" }
+  ],
+  "alcoholPolicy": {
+    "corkageFee": false,
+    "selfSupply": true,
+    "serviceFee": 0,
+    "description": "Obsługa alkoholu dostarczonego przez klientów wliczona w opłatę stałą (chłodzenie, roznoszenie)."
+  },
+  "timing": {
+    "endTime": null,
+    "overtimePrice": null
+  },
+  "staffing": {
+    "ratio": null,
+    "description": "Obsługa kelnerska wliczona w opłatę stałą."
+  },
+  "dataGaps": [
+    "Zaliczka",
+    "Godz. zakończenia/nadgodziny",
+    "Ceny 2026"
+  ],
+  "questionsToAsk": [
+    "Jak wygląda struktura zaliczki (kwota, terminy)?",
+    "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
+    "Jakie będą ceny na 2026 rok?",
+    "Ile dokładnie jest pokoi noclegowych (powyżej 26 miejsc wliczonych)?",
+    "Jakie są dostępne terminy na 2026?"
+  ]
+}

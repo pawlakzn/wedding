@@ -1,0 +1,123 @@
+{
+  "id": "trzy-drzewa",
+  "name": "Trzy Drzewa",
+  "address": "Rzetnia 107, 63-600 Kępno",
+  "coordinates": { "lat": 51.3491, "lng": 17.9131 },
+  "distance": {
+    "fromWroclaw": { "km": 160, "minutes": 120 },
+    "fromWieruszow": { "km": 35, "minutes": 35 }
+  },
+  "contact": {
+    "person": "Ewelina Piekielna-Siwek",
+    "phone": "668 371 592 / 880 303 900",
+    "email": "biuro@trzydrzewa.com",
+    "instagram": null,
+    "website": "https://trzydrzewa.com/"
+  },
+  "capacity": {
+    "min": null,
+    "max": 180
+  },
+  "pricing": {
+    "perPerson": 439,
+    "year": 2026,
+    "menuOptions": [
+      { "name": "Menu standardowe", "pricePerPerson": 439 }
+    ],
+    "hallRental": 4500,
+    "hallRentalDescription": "Wyłączność obiektu (salka górna 1500 + domek 3000)",
+    "mandatoryFees": [
+      { "name": "ZAiKS/STOART (muzyka na sali)", "price": 350, "unit": "ryczałt" }
+    ]
+  },
+  "deposit": {
+    "structure": null,
+    "description": null
+  },
+  "discounts": [
+    { "type": "dzień", "value": 5, "condition": "Czwartek lub piątek, cały rok" },
+    { "type": "sezon", "value": 10, "condition": "Sty-Kwi, Paź-Gru (nie sumuje się z rabatem za dzień)" }
+  ],
+  "children": {
+    "freeUpTo": 3,
+    "discountUpTo": 8,
+    "discountPercent": 50
+  },
+  "rooms": {
+    "count": 7,
+    "totalBeds": 30,
+    "pricePerNight": 125,
+    "breakfastIncluded": false,
+    "breakfastPrice": 35,
+    "brideGroomFree": true,
+    "checkoutTime": "10:00",
+    "meetsMinimum25": true,
+    "description": "7 pokoi klim., 30 miejsc, 125 zł/os, śniadanie 35 zł. Pokój Młodej Pary gratis. Doba hotelowa kończy się o 10:00."
+  },
+  "includes": [
+    "Zastawa stołowa",
+    "Serwetki",
+    "Podtalerze (srebrne/złote)",
+    "Oświetlenie",
+    "Obrusy (biały/czarny/beżowy/zielony)",
+    "Falbany, skirty, bankietówki",
+    "Klimatyzacja",
+    "Stoły okrągłe i prostokątne"
+  ],
+  "extras": [
+    { "name": "Deser: owoce filetowane i drylowane (100% porcja)", "price": 20, "unit": "os." },
+    { "name": "Deser: owoce filetowane i drylowane (50% porcja)", "price": 10, "unit": "os." },
+    { "name": "Mini desery (100% porcja)", "price": 24, "unit": "os." },
+    { "name": "Mini desery (50% porcja)", "price": 14, "unit": "os." },
+    { "name": "Bufet kawowo-herbaciany", "price": 10, "unit": "os.", "note": "w cenie przy zamówieniu słodkiego stołu" },
+    { "name": "Wiejski stół (produkty dostarcza organizator)", "price": 300, "unit": "ryczałt" },
+    { "name": "Wiejski stół kompleksowy przez Trzy Drzewa", "price": null, "unit": "2500-3500 zł ryczałt" },
+    { "name": "Roznoszenie alkoholu w czasie wesela", "price": 500, "unit": "ryczałt" },
+    { "name": "Pokrowce na krzesła", "price": 8, "unit": "szt." },
+    { "name": "Sprzątanie terenu zewnętrznego po confetti", "price": 300, "unit": "ryczałt" },
+    { "name": "Sprzątanie confetti wewnątrz lokalu", "price": 100, "unit": "ryczałt" },
+    { "name": "Dezynfekcja wymiocin", "price": 200, "unit": "ryczałt" },
+    { "name": "Dodatkowy cooler z lodem (czarny cooler na wódkę)", "price": 50, "unit": "szt./dzień" },
+    { "name": "Utylizacja butelek szklanych po alkoholu", "price": 300, "unit": "ryczałt" }
+  ],
+  "alcoholPolicy": {
+    "corkageFee": null,
+    "selfSupply": null,
+    "serviceFee": 500,
+    "description": "Roznoszenie alkoholu przez obsługę: 500 zł ryczałt. Zastrzegają wgląd do paragonów za alkohol, tort, ciasta i inne wyroby gastronomiczne."
+  },
+  "timing": {
+    "endTime": null,
+    "overtimePrice": null
+  },
+  "staffing": {
+    "ratio": null,
+    "description": "Osoby techniczne (DJ, zespół, fotograf) płacą 100% ceny menu."
+  },
+  "deadlines": {
+    "guestCountConfirmation": "7 dni przed przyjęciem",
+    "menuConfirmation": "30 dni przed przyjęciem"
+  },
+  "nearbyAccommodation": [
+    {
+      "name": "Pod borem",
+      "rooms": 12,
+      "beds": 27,
+      "links": {
+        "facebook": "https://www.facebook.com/PodBoremEldorado",
+        "booking": "https://www.booking.com/hotel/pl/pod-borem-rzetnia.pl.html"
+      }
+    }
+  ],
+  "dataGaps": [
+    "Min. gości",
+    "Zaliczka",
+    "Godz. zakończenia/nadgodziny"
+  ],
+  "questionsToAsk": [
+    "Jaka jest minimalna liczba gości?",
+    "Jak wygląda struktura zaliczki (kwota, terminy)?",
+    "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
+    "Jakie są dostępne terminy na 2026 rok?"
+  ]
+}
