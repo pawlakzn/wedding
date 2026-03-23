@@ -473,7 +473,9 @@ function renderCalculator() {
     else if (v.pricing.hallRentalSaturday) hallCost = v.pricing.hallRentalSaturday;
     else if (v.pricing.flatFee) hallCost = v.pricing.flatFee;
 
-    const alcoholService = (v.alcoholPolicy.serviceFee || 0) * guests;
+    const alcoholService = v.alcoholPolicy.serviceFeeUnit === 'ryczałt'
+      ? (v.alcoholPolicy.serviceFee || 0)
+      : (v.alcoholPolicy.serviceFee || 0) * guests;
     const roomEstimate = v.rooms.totalBeds && v.rooms.pricePerNight ? Math.min(25, v.rooms.totalBeds) * v.rooms.pricePerNight : 0;
 
     const total = menuCost + hallCost + alcoholService + roomEstimate;

@@ -84,6 +84,7 @@
     "corkageFee": null,
     "selfSupply": null,
     "serviceFee": 500,
+    "serviceFeeUnit": "ryczałt",
     "description": "Roznoszenie alkoholu przez obsługę: 500 zł ryczałt. Zastrzegają wgląd do paragonów za alkohol, tort, ciasta i inne wyroby gastronomiczne."
   },
   "timing": {
