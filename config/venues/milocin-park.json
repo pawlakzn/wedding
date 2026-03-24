@@ -1,0 +1,86 @@
+{
+  "id": "milocin-park",
+  "name": "Miłocin Park",
+  "address": "Wrocławska 111, 55-114 Pierwoszów",
+  "coordinates": { "lat": 51.258512, "lng": 17.094272 },
+  "distance": {
+    "fromWroclaw": { "km": 25, "minutes": 38 },
+    "fromWieruszow": { "km": 92, "minutes": 75 }
+  },
+  "contact": {
+    "person": null,
+    "phone": "661 034 034",
+    "email": "gastronomia@milocin.com.pl",
+    "instagram": null,
+    "website": "https://www.milocin.com.pl/wesela"
+  },
+  "capacity": {
+    "min": null,
+    "max": 180
+  },
+  "pricing": {
+    "perPerson": null,
+    "year": 2026,
+    "menuOptions": [],
+    "hallRental": null
+  },
+  "deposit": {
+    "structure": null,
+    "description": null
+  },
+  "discounts": [],
+  "children": {
+    "freeUpTo": null,
+    "discountUpTo": null,
+    "discountPercent": null
+  },
+  "rooms": {
+    "count": null,
+    "totalBeds": 200,
+    "pricePerNight": null,
+    "breakfastIncluded": null,
+    "brideGroomFree": null,
+    "meetsMinimum25": true,
+    "description": "200 miejsc noclegowych na terenie obiektu."
+  },
+  "includes": [],
+  "extras": [],
+  "alcoholPolicy": {
+    "corkageFee": null,
+    "selfSupply": null,
+    "serviceFee": null,
+    "description": null
+  },
+  "timing": {
+    "endTime": null,
+    "overtimePrice": null
+  },
+  "staffing": {
+    "ratio": null,
+    "description": null
+  },
+  "dataGaps": [
+    "Cena menu (cena/os.)",
+    "Wynajem sali",
+    "Zaliczka",
+    "Rabaty",
+    "Dzieci",
+    "Alkohol",
+    "Co w cenie",
+    "Nadgodziny",
+    "Obsługa",
+    "Cena noclegów"
+  ],
+  "questionsToAsk": [
+    "Jaka jest cena menu weselnego na osobę?",
+    "Jaki jest koszt wynajmu sali?",
+    "Jak wygląda struktura zaliczki?",
+    "Czy są rabaty za wesele w piątek lub poza sezonem?",
+    "Jaki jest cennik dla dzieci?",
+    "Jaka jest polityka alkoholowa — korkowe, własny alkohol?",
+    "Co dokładnie jest wliczone w cenę?",
+    "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
+    "Ilu kelnerów obsługuje wesele?",
+    "Jaka jest cena noclegu na osobę?"
+  ]
+}
