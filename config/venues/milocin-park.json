@@ -9,8 +9,8 @@
   },
   "contact": {
     "person": null,
-    "phone": "661 034 034",
-    "email": "gastronomia@milocin.com.pl",
+    "phone": "661 034 034 / 608 869 366",
+    "email": "bankiety@milocin.com.pl",
     "instagram": null,
     "website": "https://www.milocin.com.pl/wesela"
   },
@@ -19,10 +19,15 @@
     "max": 180
   },
   "pricing": {
-    "perPerson": null,
-    "year": 2026,
-    "menuOptions": [],
-    "hallRental": null
+    "perPerson": 460,
+    "year": 2025,
+    "menuOptions": [
+      { "name": "Sosnowa", "pricePerPerson": 460, "description": "4 mięsa/ryby, zimna płyta (10 poz.), 3 dania gorące" },
+      { "name": "Bukowa", "pricePerPerson": 480, "description": "Przystawka serwowana, 5 mięs/ryb, zimna płyta (11 poz.), 3 dania gorące, coolery na wódkę" },
+      { "name": "Dębowa", "pricePerPerson": 570, "description": "Wykwintna przystawka, 6 mięs/ryb (3 porcje/os), zimna płyta (12 poz.), tort weselny z racami, fondue czekoladowe, rabat 15% na bufety, pokoje dla 25 gości, obsługa kelnerska alkoholu" }
+    ],
+    "hallRental": 0,
+    "hallRentalDescription": "Wynajem sali wliczony w cenę menu"
   },
   "deposit": {
     "structure": null,
@@ -30,7 +35,8 @@
   },
   "discounts": [],
   "children": {
-    "freeUpTo": null,
+    "freeUpTo": 4,
+    "freeUpToNote": "Dotyczy noclegów (dzieci do 4 lat w łóżku z rodzicami gratis)",
     "discountUpTo": null,
     "discountPercent": null
   },
@@ -38,49 +44,106 @@
     "count": null,
     "totalBeds": 200,
     "pricePerNight": null,
-    "breakfastIncluded": null,
-    "brideGroomFree": null,
+    "breakfastIncluded": false,
+    "breakfastPrice": 52,
+    "brideGroomFree": true,
+    "brideGroomFreeNote": "Apartament dla Nowożeńców na noc poślubną wliczony w cenę menu",
     "meetsMinimum25": true,
-    "description": "200 miejsc noclegowych na terenie obiektu."
+    "description": "200 miejsc noclegowych. Karczma: 2x(2-os) 180 zł, 3x(3-os) 240 zł, 3x(4-os) 320 zł. Hotel: 14x(2-os) 210 zł, 6x studio 5-os 460 zł, 8x studio (2+3-os) 460 zł. Dostawka 80 zł. Śniadania 52 zł/os."
   },
-  "includes": [],
-  "extras": [],
+  "includes": [
+    "Wynajem klimatyzowanej sali weselnej",
+    "Obsługa kelnerska (~1 kelner / 20 gości)",
+    "Możliwość dostarczenia własnego alkoholu + magazynek do chłodzenia",
+    "Parking dla gości",
+    "Plener do dyspozycji na sesję ślubną (dowolny termin)",
+    "Podstawowe dekoracje stołów (obrusy, serwetki materiałowe)",
+    "Podstawowe dekoracje kwiatowe + konsultacja florysty",
+    "Apartament dla Nowożeńców na noc poślubną",
+    "Niespodzianki wybuchowe na wiwat gościom",
+    "Niespodzianka w Alei Zakochanych",
+    "Opłata korkowa"
+  ],
+  "includesByPlan": {
+    "Bukowa i Dębowa": [
+      "Możliwość organizacji ceremonii zaślubin w ogrodzie (aranżacja za dodatkową opłatą)",
+      "Coolery na wódkę na stołach"
+    ],
+    "Dębowa": [
+      "Obsługa kelnerska dostarczonego alkoholu",
+      "Pokoje dla gości nad salą weselną (25 miejsc)",
+      "Rabat 15% na bufety wiejski i słodki",
+      "Tort weselny ze świetlnymi racami"
+    ]
+  },
+  "extras": [
+    { "name": "Powitalny koktajl (finger foods 4 szt/os + napoje bezalk.)", "price": 55, "unit": "os." },
+    { "name": "Stół wiejski podstawowy (kiełbasy, smalec, chleb itp., min. 80 os)", "price": 35, "unit": "os." },
+    { "name": "Stół wiejski + szynka wędzona z kością, deski serów i ryb", "price": 45, "unit": "os." },
+    { "name": "Stół wiejski + pierogi zapiekane i bigos na ciepło", "price": 52, "unit": "os." },
+    { "name": "Stół owocowy (sałatka, musy, deserki, fondue czekoladowe)", "price": 38, "unit": "os." },
+    { "name": "Świniak pieczony nadziewany (~70 porcji)", "price": 2300, "unit": "ryczałt" },
+    { "name": "Fondue czekoladowe (~80 os)", "price": 900, "unit": "ryczałt" },
+    { "name": "Candy bar", "price": null, "unit": "wycena indywidualna" },
+    { "name": "Deser lodowy", "price": 22, "unit": "os." },
+    { "name": "Tort weselny (bita śmietana z owocami)", "price": 135, "unit": "zł/kg (od)" },
+    { "name": "Fotobudka z gadżetami", "price": 700, "unit": "2h" },
+    { "name": "Pokrowce na krzesła z szarfą", "price": 18, "unit": "szt." },
+    { "name": "Dekoracja sali światłem scenicznym", "price": null, "unit": "wycena indywidualna" },
+    { "name": "Pokazy pirotechniczne z muzyką", "price": 3000, "unit": "ryczałt (od)" },
+    { "name": "Animatorki dla dzieci", "price": null, "unit": "wycena indywidualna" },
+    { "name": "Transport gości", "price": null, "unit": "wycena indywidualna" }
+  ],
+  "poprawiny": {
+    "pricePerPerson": 160,
+    "description": "Dania z grilla (3 porcje/os): steak z karczku, szaszłyk drobiowy, kiełbasy, podudzie, camembert. Dodatki: ziemniaki pieczone, warzywa grillowane, żurek. Bufet zimny: smalec, sałatki, pieczywo. Woda + sok 1l/os, kawa/herbata b/o.",
+    "extras": [
+      { "name": "Zimne przekąski (5 do wyboru)", "price": 48, "unit": "os." },
+      { "name": "Słodki stół (ciasta, owoce)", "price": 32, "unit": "os." },
+      { "name": "Wynajem wiaty średniej (40 os)", "price": 520, "unit": "5h" },
+      { "name": "Wynajem wiaty dużej (od 40 os)", "price": 2200, "unit": "5h" },
+      { "name": "Ognisko", "price": 500, "unit": "ryczałt" },
+      { "name": "Pierogi mix (4 szt)", "price": 16, "unit": "porcja" },
+      { "name": "Zupa gulaszowa", "price": 21, "unit": "porcja" },
+      { "name": "Flaki z boczniaka (vege)", "price": 19, "unit": "porcja" },
+      { "name": "Bigos Staropolski", "price": 22, "unit": "porcja" },
+      { "name": "Gołąbki z kaszą i pieczarkami (2 szt, vege)", "price": 21, "unit": "porcja" },
+      { "name": "Golonki w sosie tymiankowym", "price": 34, "unit": "porcja" },
+      { "name": "Udziec pieczony z ziemniakiem", "price": 42, "unit": "porcja" },
+      { "name": "Prosiak w całości z kaszą i podrobami", "price": 2300, "unit": "ryczałt" },
+      { "name": "Zestaw ogniskowy (kiełbasa, pieczywo, dodatki)", "price": 21, "unit": "porcja" }
+    ]
+  },
   "alcoholPolicy": {
-    "corkageFee": null,
-    "selfSupply": null,
+    "corkageFee": 0,
+    "selfSupply": true,
     "serviceFee": null,
-    "description": null
+    "description": "Własny alkohol dozwolony. Opłata korkowa wliczona w cenę menu. Dostęp do magazynku do przechowywania i chłodzenia. W ofercie Dębowej obsługa kelnerska dostarczonego alkoholu wliczona w cenę."
   },
   "timing": {
     "endTime": null,
     "overtimePrice": null
   },
   "staffing": {
-    "ratio": null,
-    "description": null
+    "ratio": "1 kelner / 20 gości",
+    "description": "Średnio 1 kelner na ok. 20 gości."
+  },
+  "outdoorCeremony": {
+    "available": true,
+    "description": "Możliwość organizacji ślubu w plenerze (wzgórze z widokiem na stawy). Aranżacja miejsca za dodatkową opłatą. Do 200 gości."
   },
   "dataGaps": [
-    "Cena menu (cena/os.)",
-    "Wynajem sali",
     "Zaliczka",
-    "Rabaty",
-    "Dzieci",
-    "Alkohol",
-    "Co w cenie",
-    "Nadgodziny",
-    "Obsługa",
-    "Cena noclegów"
+    "Rabaty sezonowe/dzienne",
+    "Godzina zakończenia wesela / nadgodziny",
+    "Ceny menu na 2026 rok (PDF z 2025)"
   ],
   "questionsToAsk": [
-    "Jaka jest cena menu weselnego na osobę?",
-    "Jaki jest koszt wynajmu sali?",
-    "Jak wygląda struktura zaliczki?",
+    "Jak wygląda struktura zaliczki (kwota, terminy)?",
     "Czy są rabaty za wesele w piątek lub poza sezonem?",
-    "Jaki jest cennik dla dzieci?",
-    "Jaka jest polityka alkoholowa — korkowe, własny alkohol?",
-    "Co dokładnie jest wliczone w cenę?",
     "O której godzinie kończy się wesele i jaka jest cena za nadgodziny?",
-    "Ilu kelnerów obsługuje wesele?",
-    "Jaka jest cena noclegu na osobę?"
+    "Jaka jest cena menu na 2026 rok?",
+    "Czy jest możliwość organizacji ceremonii w ogrodzie i jaki jest koszt aranżacji?",
+    "Czy dostępne są daty w 2026 roku?"
   ]
 }
