@@ -5,7 +5,7 @@
   "coordinates": { "lat": 51.2752, "lng": 17.0600 },
   "distance": {
     "fromWroclaw": { "km": 20, "minutes": 25 },
-    "fromWieruszow": { "km": 200, "minutes": 135 }
+    "fromWieruszow": { "km": 130, "minutes": 100 }
   },
   "contact": {
     "person": "Michał Selucha",
