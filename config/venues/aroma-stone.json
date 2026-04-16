@@ -2,7 +2,7 @@
   "id": "aroma-stone",
   "name": "Aroma Stone",
   "address": "Szosa Kępińska 81, 56-500 Syców",
-  "coordinates": { "lat": 51.0680, "lng": 17.7300 },
+  "coordinates": { "lat": 51.3080, "lng": 17.7250 },
   "distance": {
     "fromWroclaw": { "km": 100, "minutes": 75 },
     "fromWieruszow": { "km": 80, "minutes": 60 }
